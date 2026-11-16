@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Symlink the applet into ~/.local/share/cinnamon/applets (changes in the repo take effect directly).
 set -euo pipefail
-UUID="glw@martin"
+UUID="glw@hansmaulwurf23"
 SRC="$(cd "$(dirname "$0")" && pwd)/$UUID"
 DEST="$HOME/.local/share/cinnamon/applets/$UUID"
 mkdir -p "$(dirname "$DEST")"

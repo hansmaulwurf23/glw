@@ -1,5 +1,5 @@
 {
-  "uuid": "glw@martin",
+  "uuid": "glw@hansmaulwurf23",
   "name": "GitLab Pipeline Watch",
   "description": "Shows whether a CI pipeline is currently running in any of your GitLab instances (auth via glab).",
   "version": "0.1.0",

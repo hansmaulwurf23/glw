@@ -51,7 +51,7 @@ cd glw && ./install.sh
 
 ## How it works
 
-`glw@martin/glw-status.py` (Python standard library only) does the work:
+`glw@hansmaulwurf23/glw-status.py` (Python standard library only) does the work:
 
 1. Reads the hosts from glab's `~/.config/glab-cli/config.yml` (or uses the configured list).
 2. Gets the token per host via `glab config get token --host <host>`
@@ -63,7 +63,7 @@ cd glw && ./install.sh
 You can run the helper on its own for debugging:
 
 ```bash
-python3 'glw@martin/glw-status.py' --hosts gitlab.example.com | python3 -m json.tool
+python3 'glw@hansmaulwurf23/glw-status.py' --hosts gitlab.example.com | python3 -m json.tool
 ```
 
 Note: pipelines started only by a schedule are noticed only if the project shows other
