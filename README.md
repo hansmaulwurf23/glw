@@ -46,6 +46,8 @@ cd glw && ./install.sh
 | GitLab hosts | *(empty)* | comma separated; empty = every glab host that has a token |
 | Project activity window | 7 days | only projects you are a member of with recent activity are checked |
 | Show finished pipelines for | 60 min | |
+| Only pipelines triggered by me | on | filters by the user who started the pipeline (push, MR, manual run, own schedules) |
+| Username(s) | *(empty)* | empty = user logged in via glab; or `alice` for all hosts; or `gitlab.example.com=alice, git.company.com=bob` |
 | Poll interval idle / busy | 60 s / 15 s | |
 | Show count, blink, notifications | on | |
 

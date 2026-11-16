@@ -92,7 +92,7 @@ class Api:
             return json.load(resp)
 
 
-def check_host(host, activity_days, recent_minutes):
+def check_host(host, activity_days, recent_minutes, only_mine=False, username=""):
     result = {"host": host, "ok": False, "error": None, "projects": 0,
               "busy": [], "ready": [], "recent": []}
     token = host_token(host)
@@ -103,6 +103,11 @@ def check_host(host, activity_days, recent_minutes):
     api = Api(host, token)
     since = (now_utc() - dt.timedelta(days=activity_days)).isoformat()
     try:
+        # pipelines are filtered by the user who triggered them (push, MR, web, schedule owner)
+        pipe_filter = {}
+        if only_mine:
+            pipe_filter["username"] = username or api.get("user")["username"]
+        result["username"] = pipe_filter.get("username")
         projects = []
         page = 1
         while page <= 5:  # at most 500 projects
@@ -124,7 +129,7 @@ def check_host(host, activity_days, recent_minutes):
     recent_limit = now_utc() - dt.timedelta(minutes=recent_minutes)
 
     def pipelines_of(p):
-        return p, api.get(f"projects/{p['id']}/pipelines", per_page=5)
+        return p, api.get(f"projects/{p['id']}/pipelines", per_page=5, **pipe_filter)
 
     errors = []
     with cf.ThreadPoolExecutor(max_workers=8) as ex:
@@ -167,17 +172,38 @@ def check_host(host, activity_days, recent_minutes):
     return result
 
 
+def parse_users(spec):
+    """'alice' -> ('alice', {}); 'a.example=alice, b.example=bob' -> ('', {...}); mixing is allowed."""
+    default, per_host = "", {}
+    for part in (p.strip() for p in spec.split(",")):
+        if not part:
+            continue
+        if "=" in part:
+            host, name = (x.strip() for x in part.split("=", 1))
+            per_host[host] = name
+        else:
+            default = part
+    return default, per_host
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--hosts", default="", help="comma separated; empty = all glab hosts that have a token")
     ap.add_argument("--activity-days", type=int, default=7)
     ap.add_argument("--recent-minutes", type=int, default=60)
+    ap.add_argument("--only-mine", action="store_true",
+                    help="only pipelines triggered by the authenticated user (or --user)")
+    ap.add_argument("--user", default="",
+                    help="username for --only-mine: 'name' for all hosts or 'host=name, host2=name2'; "
+                         "empty = the user logged in via glab")
     args = ap.parse_args()
 
+    default_user, host_users = parse_users(args.user)
     explicit = [h.strip() for h in args.hosts.split(",") if h.strip()]
     hosts = explicit or glab_hosts()
     with cf.ThreadPoolExecutor(max_workers=max(1, len(hosts))) as ex:
-        results = list(ex.map(lambda h: check_host(h, args.activity_days, args.recent_minutes), hosts))
+        results = list(ex.map(lambda h: check_host(h, args.activity_days, args.recent_minutes, args.only_mine,
+                                                     host_users.get(h, default_user)), hosts))
     if not explicit:
         # auto-discovery: silently drop hosts without a token (e.g. gitlab.com)
         results = [r for r in results if not r.get("skipped")]

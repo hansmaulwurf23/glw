@@ -47,7 +47,8 @@ class GlwApplet extends Applet.TextIconApplet {
         for (let [key, prop] of [["hosts", "hosts"], ["activity-days", "activityDays"],
                                  ["recent-minutes", "recentMinutes"], ["interval-idle", "intervalIdle"],
                                  ["interval-busy", "intervalBusy"], ["show-count", "showCount"],
-                                 ["animate", "animate"], ["notify", "notify"]]) {
+                                 ["animate", "animate"], ["notify", "notify"],
+                                 ["only-mine", "onlyMine"], ["username", "username"]]) {
             this.settings.bind(key, prop, () => this._onSettingsChanged());
         }
 
@@ -108,6 +109,7 @@ class GlwApplet extends Applet.TextIconApplet {
                     "--hosts", this.hosts || "",
                     "--activity-days", String(this.activityDays),
                     "--recent-minutes", String(this.recentMinutes)];
+        if (this.onlyMine) argv.push("--only-mine", "--user", this.username || "");
         try {
             let proc = Gio.Subprocess.new(argv,
                 Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE);
@@ -254,7 +256,8 @@ class GlwApplet extends Applet.TextIconApplet {
 
             for (let h of d.hosts) {
                 let txt = h.error ? "⚠ " + h.host + ": " + h.error
-                                  : h.host + ": " + h.projects + " active projects";
+                                  : h.host + ": " + h.projects + " active projects" +
+                                    (h.username ? " (user " + h.username + ")" : "");
                 let item = new PopupMenu.PopupMenuItem(txt);
                 item.connect("activate", () => this._openUrl("https://" + h.host + "/dashboard/projects"));
                 this.menu.addMenuItem(item);
