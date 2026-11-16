@@ -1,0 +1,30 @@
+{
+  "head-general": { "type": "header", "description": "GitLab" },
+  "hosts": {
+    "type": "entry",
+    "default": "",
+    "description": "GitLab hosts (comma separated)",
+    "tooltip": "Leave empty to use every host from glab that has a token. Tokens come from 'glab auth login'."
+  },
+  "activity-days": {
+    "type": "spinbutton", "default": 7, "min": 1, "max": 365, "step": 1, "units": "days",
+    "description": "Only projects with activity within the last"
+  },
+  "recent-minutes": {
+    "type": "spinbutton", "default": 60, "min": 1, "max": 1440, "step": 5, "units": "minutes",
+    "description": "Show finished pipelines for"
+  },
+  "head-poll": { "type": "header", "description": "Polling" },
+  "interval-idle": {
+    "type": "spinbutton", "default": 60, "min": 10, "max": 3600, "step": 10, "units": "seconds",
+    "description": "Interval while nothing is running"
+  },
+  "interval-busy": {
+    "type": "spinbutton", "default": 15, "min": 5, "max": 600, "step": 5, "units": "seconds",
+    "description": "Interval while pipelines are running"
+  },
+  "head-display": { "type": "header", "description": "Display" },
+  "show-count": { "type": "switch", "default": true, "description": "Show number of running pipelines next to the icon" },
+  "animate": { "type": "switch", "default": true, "description": "Blink icon while pipelines are running" },
+  "notify": { "type": "switch", "default": true, "description": "Desktop notification when a pipeline finishes" }
+}
